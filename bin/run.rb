@@ -35,7 +35,18 @@ class AppCLI
         puts "\n\nN a m e  y o u r  p r i c e ."
         price = gets.chomp
         @coffee = Coffee.create(name: name, category: category, season: season, price: price)
-        puts "\n\nT h e r e  y o u  g o ,  o n e  d e l i c i o u s  #{@coffee.name}"
+        puts "\n\nT h e r e  y o u  g o ,  o n e  d e l i c i o u s  #{@coffee.name.green}"
+        prompt = TTY::Prompt.new
+        x = prompt.select("\n\nN o w  w h a t  w o u l d  y o u  l i k e  t o  d o ?") do |menu|
+            menu.choice "M a k e  a n o t h e r  D r i n k", 1
+            menu.choice "G o  b a c k  t o  H o m e\n\n", 2
+        end
+        prompt
+        if x == 1
+            create_drink
+        else
+            home
+        end
     end
 
     def login_or_new
@@ -43,30 +54,36 @@ class AppCLI
         v = prompt.select("\n\nL e t ' s   d i s c o v e r  y o u r  n e w  f a v o r i t e  C o f f e e !") do |menu|
             menu.choice "L o g i n", 1
             menu.choice "N e w  U s e r\n\n", 2
+            menu.choice "Q u i t\n\n", 3
         end
         prompt
         if v == 2
             create_user
             puts "W E L C O M E  #{@user.name.green}"
-        else
+        elsif v == 1
             login
+        else
+            quit
         end
     end
 
-    def main_menu
+    def home
         prompt = TTY::Prompt.new
-        x = prompt.select("\n\nW h a t  w o u l d  y o u  l i k e  t o  d o ?") do |menu|
+        x = prompt.select("\n\nB o r g K o f f e e  -  H o m e\n") do |menu|
             menu.choice "M a k e  m y  o w n  d r i n k", 1
             menu.choice "G e t  a  d r i n k  s u g g e s t i o n", 2
-            menu.choice "L e t  m e  s e l e c t  a  d r i n k\n\n", 3
+            menu.choice "L e t  m e  s e e  t h e  m e n u\n\n", 3
+            menu.choice "Q u i t\n\n", 4
         end
         prompt
         if x == 1
             create_drink
         elsif x == 2
             suggest_drink
-        else
+        elsif x == 3
             menu
+        else
+            quit
         end
     end
 
@@ -81,7 +98,7 @@ class AppCLI
         x = prompt.select("\n\nH o w  d o e s  t h a t  s o u n d ?") do |menu|
             menu.choice "S o u n d s  g r e a t ,  I ' l l  t a k e  i t", 1
             menu.choice "W h a t  e l s e  y a  g o t ?", 2
-            menu.choice "N e v e r m i n d", 3
+            menu.choice "R e t u r n  t o  H o m e", 3
         end
         prompt
         if x == 1
@@ -92,7 +109,7 @@ class AppCLI
         elsif x == 2
             suggest_drink
         else
-            main_menu
+            home
         end
 
     end
@@ -101,13 +118,29 @@ class AppCLI
         Coffee.all.each_with_index do |c|
             p "#{c.name} - #{c.price}"
         end
+        prompt = TTY::Prompt.new
+        x = prompt.select("\n\nN o w  w h a t  w o u l d  y o u  l i k e  t o  d o ?") do |menu|
+            menu.choice "M a k e  a n o t h e r  D r i n k", 1
+            menu.choice "G o  b a c k  t o  H o m e\n\n", 2
+        end
+        prompt
+        if x == 1
+            create_drink
+        else
+            home
+        end
+        
+    end
+
+    def quit
+        abort
     end
 
 
     def run
         welcome       
         login_or_new
-        main_menu
+        home
     end
 
 end

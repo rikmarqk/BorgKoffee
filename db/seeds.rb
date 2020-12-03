@@ -1,5 +1,9 @@
+User.destroy_all
+Coffee.destroy_all
+
 charlotte = User.create(name: "Charlotte",date_of_birth: 12201991,email: "charlo1991@gmail.com")
 scarlet = User.create(name: "Scarlet",date_of_birth: 10211998,email: "harletoscara@gmail.com")
+
 
 coffee1 = Coffee.create(name: "Chestnut Praline Latte",category: "Hot Coffee",season: "Holiday",price: 4.75)
 coffee2 = Coffee.create(name: "Cafe Americano",category: "Hot Coffee",season: "Holiday",price: 4.75)
