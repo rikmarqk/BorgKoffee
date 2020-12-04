@@ -88,48 +88,91 @@ class AppCLI
     end
 
     def suggest_drink
-        sugg = []
-        Coffee.all.each_with_index do |c|
-            sugg << "#{c.name} for #{c.price}"
-        end
-        drink = sugg.sample
-        puts "\nH o w  a b o u t  a(n)  #{drink.green} ?"
+        total = 0
+        drink = Coffee.all.sample
+        puts "\nH o w  a b o u t  a(n) #{drink.name} for #{drink.price} ?"
         prompt = TTY::Prompt.new
         x = prompt.select("\n\nH o w  d o e s  t h a t  s o u n d ?") do |menu|
             menu.choice "S o u n d s  g r e a t ,  I ' l l  t a k e  i t", 1
-            menu.choice "W h a t  e l s e  y a  g o t ?", 2
-            menu.choice "R e t u r n  t o  H o m e", 3
+            menu.choice "W h a t  e l s e  y a  g o t ?\n\n", 2
+            menu.choice "R e t u r n  t o  H o m e\n\n", 3
         end
         prompt
         if x == 1
             puts "E x c e l l e n t ,  h o w  m a n y  w o u l d  y o u  l i k e ?"
             quantity = gets.chomp
-            total = quantity ** price
+            total = quantity.to_f * drink.price
             puts "Your total is #{total}"
         elsif x == 2
             suggest_drink
         else
             home
         end
+        prompt2 = TTY::Prompt.new
+        y = prompt.select("\n\nH o w  d o e s  t h a t  s o u n d ?") do |menu|
+            menu.choice "A n o t h e r  S u g g e s t i o n  P l e a s e", 1
+            menu.choice "R e t u r n  t o  H o m e\n\n", 2
+            menu.choice "Q u i t\n\n", 3
+        end
+        prompt2
+        if y == 1
+            puts "E x c e l l e n t ,  h o w  m a n y  w o u l d  y o u  l i k e ?"
+            suggest_drink
+        elsif y == 2
+            home
+        else
+            quit
+        end
 
     end
 
     def menu
-        Coffee.all.each_with_index do |c|
-            p "#{c.name} - #{c.price}"
-        end
+        puts "W h i c h  c i t y  a r e  l o c a t e d  a t ?"
+        location = gets.chomp
+        receipt = Receipt.create(location: location)
+        coffee_options = Coffee.all.map {|coffee| coffee.name}
         prompt = TTY::Prompt.new
-        x = prompt.select("\n\nN o w  w h a t  w o u l d  y o u  l i k e  t o  d o ?") do |menu|
-            menu.choice "M a k e  a n o t h e r  D r i n k", 1
-            menu.choice "G o  b a c k  t o  H o m e\n\n", 2
+        x = prompt.select("N o w  w h a t  w o u l d  y o u  l i k e  t o  d o ?\n\n", coffee_options)
+        prompt
+        selected_coffee = Coffee.all.find {|coffee| coffee.name == x}
+        puts selected_coffee.name.green
+        puts "$"+ selected_coffee.price.to_s
+        puts selected_coffee.category
+        puts selected_coffee.season
+        prompt = TTY::Prompt.new
+        x = prompt.select("\n\nH o w  d o e s  t h a t  s o u n d ?") do |menu|
+            menu.choice "S o u n d s  g r e a t ,  I ' l l  t a k e  i t", 1
+            menu.choice "R e t u r n  t o  M e n u\n\n", 2
+            menu.choice "R e t u r n  t o  H o m e\n\n", 3
         end
         prompt
         if x == 1
-            create_drink
+            puts "E x c e l l e n t ,  h o w  m a n y  w o u l d  y o u  l i k e ?"
+            quantity = gets.chomp
+            total = quantity.to_f * selected_coffee.price
+            p "Y o u r  t o t a l  i s  $#{total}"
+            coffee_receipt = CoffeeReceipt.create(coffee_id: selected_coffee.id, receipt_id: receipt.id)
+        elsif x == 2
+            menu
         else
             home
         end
-        
+        prompt2 = TTY::Prompt.new
+        y = prompt.select("\n\nW h a t  w o u l d  y o u  l i k e  t o  d o  n e x t ?") do |menu|
+            menu.choice "S e e  M e n u  a g a i n", 1
+            menu.choice "R e t u r n  t o  H o m e\n\n", 2
+            menu.choice "Q u i t\n\n", 3
+        end
+        prompt2
+        if y == 1
+            menu
+        elsif y == 2
+            home
+        else
+            quit
+        end
+
+
     end
 
     def quit

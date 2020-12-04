@@ -4,6 +4,7 @@ class CreateUsers < ActiveRecord::Migration[6.0]
       t.string :name
       t.integer :date_of_birth
       t.string :email
+      t.integer :receipt_id
     end
   end
 end

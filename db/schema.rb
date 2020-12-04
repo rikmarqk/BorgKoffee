@@ -34,6 +34,7 @@ ActiveRecord::Schema.define(version: 2020_12_03_024314) do
     t.string "name"
     t.integer "date_of_birth"
     t.string "email"
+    t.integer "receipt_id"
   end
 
 end
